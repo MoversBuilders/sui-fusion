@@ -1,0 +1,8 @@
+[package]
+name = "limit_order"
+edition = "2024.beta"
+# license = "BSD-3-Clause"
+# authors = ["Marios Isaakidis (marios@movers.builders)"]
+
+[addresses]
+limit_order = "0x0"

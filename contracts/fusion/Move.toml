@@ -1,0 +1,11 @@
+[package]
+name = "fusion"
+edition = "2024.beta"
+# license = "BSD-3-Clause"
+# authors = ["Marios Isaakidis (marios@movers.builders)"]
+
+[dependencies]
+limit_order = { local = "../limit_order" }
+
+[addresses]
+fusion = "0x0"
