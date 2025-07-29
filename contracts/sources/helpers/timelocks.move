@@ -1,13 +1,12 @@
 // Implements the TimelocksLib.sol library from 1inch/cross-chain-swap 
 
 module fusion::timelocks {
-    use sui::bcs;
     use std::u256;
+    use sui::bcs;
 
     const DEPLOYED_AT_MASK: u256 = 0xffffffff00000000000000000000000000000000000000000000000000000000;
     const DEPLOYED_AT_OFFSET: u8 = 224;
     const STAGE_BIT_SIZE: u8 = 32;
-    const U32_MASK: u256 = 0xFFFFFFFF; // 32-bit mask for extracting uint32 values
 
     /// Compact timelock storage
     public struct Timelocks has copy, drop, store {
@@ -28,7 +27,7 @@ module fusion::timelocks {
     /// Maps TimelockStage to its corresponding bit position
     /// @param stage The stage to map
     /// @return The bit position for the given stage
-    public fun stage_to_bit_pos(stage: TimelockStage): u8 {
+    fun stage_to_bit_pos(stage: TimelockStage): u8 {
         match (stage) {
             TimelockStage::SrcWithdrawal => 0,
             TimelockStage::SrcPublicWithdrawal => 1,
@@ -72,6 +71,13 @@ module fusion::timelocks {
         let data = timelocks.value;
         let bit_shift = (stage_to_bit_pos(stage) * STAGE_BIT_SIZE) as u8;
         // This matches the Solidity: (data >> _DEPLOYED_AT_OFFSET) + uint32(data >> bitShift)
-        (data >> DEPLOYED_AT_OFFSET) + ((data >> bit_shift) & U32_MASK)
+        (data >> DEPLOYED_AT_OFFSET) + ((data >> bit_shift) & 0xFFFFFFFF)
     }
-} 
+
+    /// Returns the byte representation of the timelocks u256 value
+    /// @param timelocks The timelocks to convert
+    /// @return The byte representation
+    public fun bytes(timelocks: &Timelocks): vector<u8> {
+        bcs::to_bytes(&timelocks.value)
+    }
+}

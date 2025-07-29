@@ -17,14 +17,14 @@ module fusion::fusion_address {
     /// Converts a FusionAddress to its byte vector representation
     /// @param a The FusionAddress to convert
     /// @return The byte representation of the address
-    public fun get_bytes(a: FusionAddress): vector<u8> {
+    public fun bytes(a: FusionAddress): vector<u8> {
         bcs::to_bytes(&a.value)
     }
 
     /// Extracts the EVM address bytes from a FusionAddress by masking the lower 160 bits
     /// @param a The FusionAddress to convert to EVM format
     /// @return The EVM address bytes (20 bytes)
-    public fun get_evm_bytes(a: FusionAddress): vector<u8> {
+    public fun evm_bytes(a: FusionAddress): vector<u8> {
         // Convert to address by masking the lower 160 bits
         let masked: u256 = a.value & LOW_160_BIT_MASK;
         bcs::to_bytes(&masked)
@@ -33,7 +33,7 @@ module fusion::fusion_address {
     /// Converts a FusionAddress to a Sui native address
     /// @param a The FusionAddress to convert
     /// @return The corresponding Sui address
-    public fun get_sui_address(a: FusionAddress): address {
+    public fun sui_address(a: FusionAddress): address {
         address::from_bytes(bcs::to_bytes(&a.value))
     }
 
@@ -42,7 +42,7 @@ module fusion::fusion_address {
     /// @param a The FusionAddress to check
     /// @param flag The flag to check for
     /// @return True if the flag is set, false otherwise
-    public fun get_evm_flag(a: FusionAddress, flag: u256): bool {
+    public fun evm_flag(a: FusionAddress, flag: u256): bool {
         (a.value & flag) != 0
     }
 }
