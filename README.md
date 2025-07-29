@@ -1,12 +1,15 @@
 # Sui 💧<->🦄 Fusion+ 
 
-This repository implements the integration of [1inch Fusion+](https://1inch.io/fusion/) with the [Sui](https://sui.io/) blockchain, providing:
+This repository implements the integration of [1inch Fusion+](https://1inch.io/fusion/) with the [Sui](https://sui.io/) blockchain, offering the following features:
 
-- **Cross-Chain Swaps**: Seamless intent-based swaps across different blockchains
-- **MEV Protection**: Built-in resistance to front-running and sandwich attacks
-- **Gasless Transactions**: Gas fees covered by resolvers
-- **Partial Fills**: Orders can be filled in parts by multiple resolvers
-- **Competitive Pricing**: Through resolver bidding via Dutch auction
+- **Cross-Chain Swaps**: Seamless intent-based swaps on liquidity across different blockchains.
+- **Non-custodial**: Based on HTLCs, funds are not held by third parties during swaps.
+- **Timelock protection**: If the swap is not completed within the designated time, the funds are returned to their original owners.
+- **MEV Protection**: Protection against front-running and sandwich attacks.
+- **Competitive Pricing**: Resolvers compete to execute swaps at the most favorable rates, through a Dutch auction model.
+- **Partial Fills**: Swaps can be filled in parts by multiple resolvers.
+- **Gasless Transactions**: Gas fees are covered by the resolvers who fill the swap.
+- **No Cross-Chain Messaging**: Swaps settled through cryptographic commitments rather than bridge-based message passing.
 
 ## License
 
