@@ -23,18 +23,18 @@ module fusion::immutables {
     /// @return The keccak256 hash of the serialized struct
     public fun hash(immutables: &Immutables): vector<u8> {
         let mut serialized = vector::empty<u8>();
-        
-        vector::append(&mut serialized, immutables.order_hash);
-        vector::append(&mut serialized, immutables.hashlock);
-        vector::append(&mut serialized, immutables.maker.bytes());
-        vector::append(&mut serialized, immutables.taker.bytes());
-        vector::append(&mut serialized, immutables.token.bytes());
-        vector::append(&mut serialized, bcs::to_bytes(&immutables.amount));
-        vector::append(&mut serialized, bcs::to_bytes(&immutables.safety_deposit));
-        vector::append(&mut serialized, timelocks::bytes(&immutables.timelocks));
+
+        serialized.append(immutables.order_hash);
+        serialized.append(immutables.hashlock);
+        serialized.append(immutables.maker.bytes());
+        serialized.append(immutables.taker.bytes());
+        serialized.append(immutables.token.bytes());
+        serialized.append(bcs::to_bytes(&immutables.amount));
+        serialized.append(bcs::to_bytes(&immutables.safety_deposit));
+        serialized.append(timelocks::bytes(&immutables.timelocks));
 
         // TODO: Validate that serialized.length() == 256 bytes
-        // Specifically check that order_hash and hashlock are 32 bytes each
+        // Suffices to check that order_hash and hashlock are 32 bytes each
 
         hash::keccak256(&serialized)
     }
