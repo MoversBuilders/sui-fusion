@@ -15,6 +15,13 @@ public struct FusionAddress has copy, drop, store {
 /// Mask for extracting the lower 160 bits (20 bytes) for EVM addresses
 const LOW_160_BIT_MASK: u256 = (1 << 160) - 1;
 
+/// Gets the raw u256 value from a FusionAddress
+/// @param a The FusionAddress to get the value from
+/// @return The raw u256 value
+public fun value(a: FusionAddress): u256 {
+    a.value
+}
+
 /// Converts a FusionAddress to its byte vector representation
 /// @param a The FusionAddress to convert
 /// @return The byte representation of the address
@@ -54,9 +61,11 @@ public fun from_sui_address(addr: address): FusionAddress {
     FusionAddress { value: address::to_u256(addr) }
 }
 
-/// Gets the raw u256 value from a FusionAddress
-/// @param a The FusionAddress to get the value from
-/// @return The raw u256 value
-public fun value(a: FusionAddress): u256 {
-    a.value
+/// Creates a FusionAddress from raw address bytes
+/// @param addr_bytes The raw address bytes (20 bytes for EVM addresses)
+/// @return The corresponding FusionAddress
+public fun from_bytes(addr_bytes: vector<u8>): FusionAddress {
+    // Convert bytes to address first, then to FusionAddress
+    let addr = address::from_bytes(addr_bytes);
+    from_sui_address(addr)
 }
