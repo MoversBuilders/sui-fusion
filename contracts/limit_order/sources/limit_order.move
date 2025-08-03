@@ -9,6 +9,8 @@ use limit_order::fusion_address::{Self, FusionAddress};
 use limit_order::amount_calculator;
 use limit_order::maker_traits;
 use limit_order::taker_traits::{Self, TakerTraits};
+use limit_order::sui_signing::{Self, SuiSignature};
+use limit_order::order_types::OrderHash;
 
 // ===== Error Constants =====
 const EINVALIDATED_ORDER: u64 = 0;
@@ -110,25 +112,34 @@ public fun hash_order(order: &Order): vector<u8> {
 public fun fill_order(
     order_book: &mut OrderBook,
     order: &Order,
-    signature: vector<u8>,
+    signature: &SuiSignature,
     amount: u256,
     taker_traits: TakerTraits,
     clock: &Clock,
     ctx: &mut TxContext
 ): FillResult {
-    let order_hash = hash_order(order);
-    let maker = fusion_address::sui_address(order_types::maker(order));
+    let order_hash = sui_signing::hash_order_blake2b(
+        order_types::salt(order),
+        order_types::maker(order),
+        order_types::receiver(order),
+        order_types::maker_asset(order),
+        order_types::taker_asset(order),
+        order_types::making_amount(order),
+        order_types::taking_amount(order),
+        order_types::maker_traits(order)
+    );
+    let maker = order_types::maker(order);
     
     // Verify order hash integrity
-    verify_order_hash_integrity(order, &order_hash);
+    verify_order_hash_integrity(order, &sui_signing::hash_value(&order_hash));
     
     // Verify signature
-    assert!(verify_signature(&order_hash, signature, maker), EBAD_SIGNATURE);
+    assert!(sui_signing::verify_order_signature(&order_hash, *signature, maker), EBAD_SIGNATURE);
     
     // Check order validity
     assert!(order_types::is_valid(order), EINVALIDATED_ORDER);
     assert!(!is_order_expired(order, clock), EORDER_EXPIRED);
-    assert!(!is_order_filled(order_book, &order_hash), EINVALIDATED_ORDER);
+    assert!(!is_order_filled(order_book, &sui_signing::hash_value(&order_hash)), EINVALIDATED_ORDER);
     
     // Verify maker permissions
     verify_maker_permissions(order, tx_context::sender(ctx), ctx);
@@ -141,7 +152,7 @@ public fun fill_order(
         order,
         amount,
         taker_traits,
-        &order_hash
+        &sui_signing::hash_value(&order_hash)
     );
     
     // Validate amounts
@@ -174,14 +185,14 @@ public fun fill_order(
     verify_order_integrity(order, making_amount, taking_amount);
     
     // Mark order as filled
-    mark_order_filled(order_book, order_hash);
+    mark_order_filled(order_book, sui_signing::hash_value(&order_hash));
     
     // Execute the swap
     execute_swap(order, making_amount, taking_amount, ctx);
     
     // Emit event
     event::emit(OrderFilled { 
-        order_hash, 
+        order_hash: sui_signing::hash_value(&order_hash), 
         making_amount, 
         taking_amount 
     });
@@ -189,7 +200,7 @@ public fun fill_order(
     FillResult {
         making_amount,
         taking_amount,
-        order_hash,
+        order_hash: sui_signing::hash_value(&order_hash),
     }
 }
 
@@ -215,16 +226,6 @@ public fun is_order_filled(
 }
 
 // ===== Private Functions =====
-
-/// Verify signature
-fun verify_signature(
-    order_hash: &vector<u8>,
-    signature: vector<u8>,
-    expected_signer: address
-): bool {
-    // TODO: Implement actual signature verification
-    false
-}
 
 /// Check if order is expired
 fun is_order_expired(order: &Order, clock: &Clock): bool {

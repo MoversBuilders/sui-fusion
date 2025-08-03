@@ -78,6 +78,13 @@ public fun hash_bytes(order_hash: &OrderHash): vector<u8> {
     order_hash.value
 }
 
+/// Creates an OrderHash from bytes (for internal use)
+/// @param value The hash bytes
+/// @return The OrderHash
+public fun create_order_hash(value: vector<u8>): OrderHash {
+    OrderHash { value }
+}
+
 /// Validates that an order has valid amounts
 /// @param order The order to validate
 /// @return True if the order is valid
