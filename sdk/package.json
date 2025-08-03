@@ -1,0 +1,45 @@
+{
+  "name": "sui-fusion-sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for interacting with the Sui <-> Fusion contracts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "directories": {
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MoversBuilders/sui-fusion.git"
+  },
+  "author": "marios@movers.builders",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/MoversBuilders/sui-fusion/issues"
+  },
+  "homepage": "https://github.com/MoversBuilders/sui-fusion#readme",
+  "keywords": [
+    "sui",
+    "fustion",
+    "limit-order",
+    "sdk",
+    "typescript"
+  ],
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.0.5",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@mysten/sui": "^1.37.1"
+  }
+}
