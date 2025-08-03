@@ -2,6 +2,7 @@ module limit_order::limit_order;
 
 use sui::table::{Self, Table};
 use sui::event;
+use sui::clock::{Self, Clock};
 
 use limit_order::order_types::{Self, Order};
 use limit_order::fusion_address::{Self, FusionAddress};
@@ -112,6 +113,7 @@ public fun fill_order(
     signature: vector<u8>,
     amount: u256,
     taker_traits: TakerTraits,
+    clock: &Clock,
     ctx: &mut TxContext
 ): FillResult {
     let order_hash = hash_order(order);
@@ -125,7 +127,7 @@ public fun fill_order(
     
     // Check order validity
     assert!(order_types::is_valid(order), EINVALIDATED_ORDER);
-    assert!(!is_order_expired(order), EORDER_EXPIRED);
+    assert!(!is_order_expired(order, clock), EORDER_EXPIRED);
     assert!(!is_order_filled(order_book, &order_hash), EINVALIDATED_ORDER);
     
     // Verify maker permissions
@@ -225,9 +227,9 @@ fun verify_signature(
 }
 
 /// Check if order is expired
-fun is_order_expired(order: &Order): bool {
+fun is_order_expired(order: &Order, clock: &Clock): bool {
     let maker_traits = maker_traits::new(order_types::maker_traits(order));
-    maker_traits::is_expired(&maker_traits)
+    maker_traits::is_expired(&maker_traits, clock)
 }
 
 /// Calculate fill amounts based on taker preferences

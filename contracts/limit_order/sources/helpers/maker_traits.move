@@ -1,5 +1,6 @@
 module limit_order::maker_traits;
 
+use sui::clock::{Self, Clock};
 use limit_order::fusion_address;
 
 // ===== Bit Position Constants =====
@@ -88,10 +89,21 @@ public fun get_expiration_time(traits: &MakerTraits): u256 {
     (traits.value >> EXPIRATION_OFFSET) & EXPIRATION_MASK
 }
 
-/// Check if order is expired (matches Solidity logic)
-public fun is_expired(traits: &MakerTraits): bool {
+/// Check if order is expired
+public fun is_expired(traits: &MakerTraits, clock: &Clock): bool {
     let expiration = get_expiration_time(traits);
-    expiration != 0u256 && expiration < 0u256 // TODO: Use actual timestamp
+    let current_time = clock::timestamp_ms(clock);
+    
+    // If expiration is 0, the order never expires
+    if (expiration == 0u256) {
+        return false
+    };
+    
+    // Convert current time to u256 for comparison (timestamp_ms returns u64)
+    let current_time_u256 = (current_time as u256) * 1000u256; // Convert to milliseconds
+    
+    // Check if current time is past expiration
+    current_time_u256 >= expiration
 }
 
 /// Check if specific sender is allowed
