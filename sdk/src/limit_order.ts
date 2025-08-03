@@ -284,6 +284,22 @@ export class LimitOrderSDK {
       makerTraits: '0', // Default traits
     };
   }
+
+  /**
+   * Get the package ID
+   * @returns The package ID
+   */
+  getPackageId(): string {
+    return this.packageId;
+  }
+
+  /**
+   * Get the module name
+   * @returns The module name
+   */
+  getModule(): string {
+    return this.module;
+  }
 }
 
 export default LimitOrderSDK;
