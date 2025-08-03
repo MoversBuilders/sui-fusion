@@ -11,6 +11,11 @@ This repository implements the integration of [1inch Fusion+](https://1inch.io/f
 - **Gasless Transactions**: Gas fees are covered by the resolvers who fill the swap.
 - **No Cross-Chain Messaging**: Swaps settled through cryptographic commitments rather than bridge-based message passing.
 
+## Frontend
+
+![Demo page](./frontend/screenshot.png)
+Live demo: [https://irglafh4v6ab2.mocha.app]
+
 ## License
 
 This project is licensed under the [BSD 3-Clause License](LICENSE).

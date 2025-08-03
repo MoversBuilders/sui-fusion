@@ -4,9 +4,10 @@ import WalletButton from '@/react-app/components/WalletButton';
 import TokenSelector from '@/react-app/components/TokenSelector';
 import BlockchainSelector from '@/react-app/components/BlockchainSelector';
 import SwapDetails from '@/react-app/components/SwapDetails';
+import SwapSettings from '@/react-app/components/SwapSettings';
 import { useWallet } from '@/react-app/hooks/useWallet';
 import { useSwap } from '@/react-app/hooks/useSwap';
-import { blockchains, suiTokens, fusionTokens, ethereumTokens } from '@/react-app/data/mockData';
+import { blockchains, suiTokens, ethereumTokens } from '@/react-app/data/mockData';
 import type { Token, Blockchain } from '@/shared/types';
 
 export default function Home() {
@@ -22,10 +23,12 @@ export default function Home() {
   const { quote, isLoadingQuote, getSwapQuote } = useSwap();
 
   const [fromBlockchain, setFromBlockchain] = useState<Blockchain | null>(blockchains[0]); // Sui
-  const [toBlockchain, setToBlockchain] = useState<Blockchain | null>(blockchains[2]); // Fusion+
+  const [toBlockchain, setToBlockchain] = useState<Blockchain | null>(blockchains[1]); // Ethereum
   const [fromToken, setFromToken] = useState<Token | null>(null);
   const [toToken, setToToken] = useState<Token | null>(null);
   const [fromAmount, setFromAmount] = useState('');
+  const [slippageTolerance, setSlippageTolerance] = useState(0.5);
+  const [minimumReceive, setMinimumReceive] = useState('');
 
   // Get tokens based on selected blockchain
   const getTokensForBlockchain = (blockchain: Blockchain | null): Token[] => {
@@ -33,8 +36,6 @@ export default function Home() {
     switch (blockchain.id) {
       case 'sui':
         return suiTokens;
-      case 'fusion':
-        return fusionTokens;
       case 'ethereum':
         return ethereumTokens;
       default:
@@ -77,7 +78,7 @@ export default function Home() {
 
   const isSwapReady = fromToken && toToken && fromAmount && parseFloat(fromAmount) > 0;
   const needsWalletConnection = (fromBlockchain?.id === 'sui' && !suiConnection?.isConnected) || 
-                               ((fromBlockchain?.id === 'ethereum' || fromBlockchain?.id === 'fusion') && !metamaskConnection?.isConnected);
+                               (fromBlockchain?.id === 'ethereum' && !metamaskConnection?.isConnected);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -89,8 +90,8 @@ export default function Home() {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
                 <Zap className="w-5 h-5 text-white" />
               </div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Sui ⟷ Fusion+
+              <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                Sui 💧{'<->'}🦄 Fusion+
               </h1>
             </div>
             
@@ -117,30 +118,44 @@ export default function Home() {
         {/* Hero Section */}
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Cross-Chain Swaps Made Simple
+            Cross-Chain Swaps
           </h2>
           <p className="text-lg text-gray-600 mb-6">
-            Seamlessly swap tokens between Sui and Fusion+ networks
+            Powered by 1inch Fusion+ technology - gasless, MEV-protected swaps between Sui and Ethereum
           </p>
           
-          <div className="flex items-center justify-center gap-8 text-sm text-gray-500">
+          <div className="flex items-center justify-center gap-6 text-sm text-gray-500 flex-wrap">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-blue-600" />
               <span>Secure</span>
             </div>
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-blue-600" />
-              <span>Fast</span>
+              <span>No Fees</span>
             </div>
             <div className="flex items-center gap-2">
               <Globe className="w-4 h-4 text-blue-600" />
-              <span>Cross-Chain</span>
+              <span>No Bridges</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
+              <span>MEV Protected</span>
             </div>
           </div>
         </div>
 
         {/* Swap Interface */}
         <div className="bg-white rounded-2xl shadow-xl border border-blue-100 p-6">
+          {/* Header with Settings */}
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Swap Tokens</h3>
+            <SwapSettings
+              slippageTolerance={slippageTolerance}
+              onSlippageChange={setSlippageTolerance}
+              minimumReceive={minimumReceive}
+              onMinimumReceiveChange={setMinimumReceive}
+            />
+          </div>
           {/* From Section */}
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -252,35 +267,59 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Info Cards */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-blue-100">
-            <div className="flex items-center gap-3">
-              <Shield className="w-6 h-6 text-blue-600" />
-              <div>
-                <h3 className="font-semibold text-gray-900">Secure</h3>
-                <p className="text-sm text-gray-600">Non-custodial swaps</p>
-              </div>
-            </div>
+        {/* Features Grid */}
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-100">
+            <Shield className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+            <h3 className="font-semibold text-gray-900 text-sm">Secure</h3>
+            <p className="text-xs text-gray-600 mt-1">Non-custodial swaps</p>
           </div>
           
-          <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-blue-100">
-            <div className="flex items-center gap-3">
-              <Zap className="w-6 h-6 text-blue-600" />
-              <div>
-                <h3 className="font-semibold text-gray-900">Fast</h3>
-                <p className="text-sm text-gray-600">2-8 minute swaps</p>
-              </div>
-            </div>
+          <div className="text-center p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-100">
+            <Zap className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+            <h3 className="font-semibold text-gray-900 text-sm">No Fees</h3>
+            <p className="text-xs text-gray-600 mt-1">Zero cost swaps</p>
           </div>
           
-          <div className="bg-white/60 backdrop-blur-sm rounded-lg p-4 border border-blue-100">
-            <div className="flex items-center gap-3">
-              <Globe className="w-6 h-6 text-blue-600" />
-              <div>
-                <h3 className="font-semibold text-gray-900">Cross-Chain</h3>
-                <p className="text-sm text-gray-600">Multiple networks</p>
+          <div className="text-center p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-100">
+            <Globe className="w-8 h-8 text-green-600 mx-auto mb-2" />
+            <h3 className="font-semibold text-gray-900 text-sm">Fast</h3>
+            <p className="text-xs text-gray-600 mt-1">Quick execution</p>
+          </div>
+          
+          <div className="text-center p-4 bg-white/80 backdrop-blur-sm rounded-xl border border-blue-100">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mx-auto mb-2 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">1inch</span>
+            </div>
+            <h3 className="font-semibold text-gray-900 text-sm">Powered</h3>
+            <p className="text-xs text-gray-600 mt-1">Fusion+ tech</p>
+          </div>
+        </div>
+
+        {/* Info Section */}
+        <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">How It Works</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div>
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-blue-600 font-bold">1</span>
               </div>
+              <h4 className="font-medium text-gray-900 mb-2">Submit Order</h4>
+              <p className="text-sm text-gray-600">Set your swap preferences and submit to the network</p>
+            </div>
+            <div>
+              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-purple-600 font-bold">2</span>
+              </div>
+              <h4 className="font-medium text-gray-900 mb-2">Resolvers Compete</h4>
+              <p className="text-sm text-gray-600">Multiple resolvers bid to fill your order at the best rate</p>
+            </div>
+            <div>
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-green-600 font-bold">3</span>
+              </div>
+              <h4 className="font-medium text-gray-900 mb-2">Instant Settlement</h4>
+              <p className="text-sm text-gray-600">Receive your tokens instantly with no fees</p>
             </div>
           </div>
         </div>

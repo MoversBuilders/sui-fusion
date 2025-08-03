@@ -1,4 +1,4 @@
-## Sui ⟷ Fusion+
+## Sui 💧↔🦄 Fusion+
 
 This app was created using https://getmocha.com.
 

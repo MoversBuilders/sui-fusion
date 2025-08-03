@@ -37,10 +37,10 @@ export function useSwap() {
         fromAmount,
         toAmount,
         exchangeRate: rate.toFixed(6),
-        priceImpact: (Math.random() * 0.5).toFixed(2),
-        networkFee: `${(Math.random() * 0.01).toFixed(4)} ETH`,
-        bridgeFee: `${(parseFloat(fromAmount) * 0.003).toFixed(4)} ${fromToken.symbol}`,
-        estimatedTime: `${Math.floor(Math.random() * 5) + 2}-${Math.floor(Math.random() * 3) + 8} min`,
+        priceImpact: (Math.random() * 0.3).toFixed(3),
+        networkFee: '$0.00',
+        bridgeFee: `${(parseFloat(fromAmount) * 0.001).toFixed(4)} ${fromToken.symbol}`,
+        estimatedTime: `${Math.floor(Math.random() * 3) + 3}-${Math.floor(Math.random() * 2) + 6} min`,
       };
 
       setQuote(mockQuote);
