@@ -35,6 +35,7 @@ const EINVALID_PERMIT2_TRANSFER: u64 = 17;
 const EETH_TRANSFER_FAILED: u64 = 19;
 const EWETH_NOT_SUPPORTED: u64 = 20;
 const EPERMIT2_NOT_SUPPORTED: u64 = 21;
+const ENOT_IMPLEMENTED: u64 = 100;
 
 // ===== Structs =====
 
@@ -100,12 +101,6 @@ public fun create_order(
         taking_amount,
         maker_traits
     )
-}
-
-/// Hash an order for signature verification
-public fun hash_order(order: &Order): vector<u8> {
-    let order_hash = order_types::hash_order(order);
-    order_types::hash_bytes(&order_hash)
 }
 
 /// Fill an order with signature verification
@@ -204,6 +199,47 @@ public fun fill_order(
     }
 }
 
+/// Fill a contract order (not implemented)
+public fun fill_contract_order(
+    order_book: &mut OrderBook,
+    order: &Order,
+    signature: vector<u8>,
+    amount: u256,
+    taker_traits: TakerTraits,
+    clock: &Clock,
+    ctx: &mut TxContext
+): FillResult {
+    abort ENOT_IMPLEMENTED
+}
+
+/// Fill a contract order with arguments (not implemented)
+public fun fill_contract_order_args(
+    order_book: &mut OrderBook,
+    order: &Order,
+    signature: vector<u8>,
+    amount: u256,
+    taker_traits: TakerTraits,
+    args: vector<u8>,
+    clock: &Clock,
+    ctx: &mut TxContext
+): FillResult {
+    abort ENOT_IMPLEMENTED
+}
+
+/// Check predicate (not implemented)
+public fun check_predicate(predicate: vector<u8>): bool {
+    abort ENOT_IMPLEMENTED
+}
+
+/// Mass invalidate orders using bit invalidator (not implemented)
+public fun bits_invalidate_for_order(
+    order_book: &mut OrderBook,
+    maker_traits: u256,
+    additional_mask: u256,
+    ctx: &mut TxContext
+) {
+    abort ENOT_IMPLEMENTED
+}
 /// Cancel an order
 public fun cancel_order(
     order_book: &mut OrderBook,
@@ -310,14 +346,12 @@ fun verify_maker_permissions(
     
     // Check if maker needs epoch manager validation
     if (maker_traits::need_check_epoch_manager(&maker_traits)) {
-        // TODO: Implement epoch manager check
-        // This would validate that the current epoch matches the order's epoch
+        abort ENOT_IMPLEMENTED
     };
     
     // Check if maker uses bit invalidator (for future implementation)
     if (maker_traits::use_bit_invalidator(&maker_traits)) {
-        // TODO: Implement bit invalidator logic
-        // This would check if the order is invalidated by bit position
+        abort ENOT_IMPLEMENTED
     };
 }
 
