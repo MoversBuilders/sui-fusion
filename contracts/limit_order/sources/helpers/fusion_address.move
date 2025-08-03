@@ -2,7 +2,7 @@
 // for working with various (EVM, Sui, Solana...) addresses encoded as uint256 values.
 // Also see Sui bridge's crypto.move
 
-module fusion::fusion_address;
+module limit_order::fusion_address;
 
 use sui::bcs;
 use sui::address;

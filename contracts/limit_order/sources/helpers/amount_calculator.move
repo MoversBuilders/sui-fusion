@@ -1,7 +1,5 @@
 module limit_order::amount_calculator;
 
-use std::math;
-
 /// @notice Calculates maker amount from taker amount
 /// @param order_maker_amount The maker amount specified in the order
 /// @param order_taker_amount The taker amount specified in the order  

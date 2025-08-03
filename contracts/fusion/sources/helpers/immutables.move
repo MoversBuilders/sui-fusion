@@ -1,7 +1,7 @@
 module fusion::immutables;
 
 use sui::hash;
-use fusion::fusion_address;
+use limit_order::fusion_address;
 use fusion::timelocks;
 use sui::bcs;
 
