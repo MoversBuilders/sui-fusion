@@ -46,3 +46,17 @@ public fun sui_address(a: FusionAddress): address {
 public fun evm_flag(a: FusionAddress, flag: u256): bool {
     (a.value & flag) != 0
 }
+
+/// Creates a FusionAddress from a Sui address
+/// @param addr The Sui address to convert
+/// @return The corresponding FusionAddress
+public fun from_sui_address(addr: address): FusionAddress {
+    FusionAddress { value: address::to_u256(addr) }
+}
+
+/// Gets the raw u256 value from a FusionAddress
+/// @param a The FusionAddress to get the value from
+/// @return The raw u256 value
+public fun value(a: FusionAddress): u256 {
+    a.value
+}
